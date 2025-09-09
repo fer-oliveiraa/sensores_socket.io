@@ -9,11 +9,12 @@ Os dados (batimentos cardíacos, velocidade e posição em campo) são transmiti
 
 ---
 
-## 📂 Estrutura do projeto
-sensores_socket.io/
-├── index.html # Cliente web simples
-├── package.json # Dependências e scripts
-└── server.js # Servidor Express + Socket.IO
+## Estrutura do projeto
+sensores_socket.io/<br>
+├── index.html # Cliente web simples<br>
+├── package.json # Dependências e scripts<br>
+├── server.js # Servidor Express + Socket.IO<br>
+└── .gitignore <br>
 
 ---
 
@@ -28,25 +29,26 @@ sensores_socket.io/
 
 1. Clone este repositório:
 
-
+```
 git clone https://github.com/fer-oliveiraa/sensores_socket.io.git
 cd sensores_socket.io
+```
 
 2. Instale as dependências:
-
+```
 npm install
-
+```
 3. Inicie o servidor:
-
+```
 npm start
-
+```
 4. Acesse no navegador:
-
+```
 http://localhost:3000
-
+```
 ## Funcionamento atual
-O servidor cria uma conexão via Socket.IO.
+- O servidor cria uma conexão via Socket.IO.
 
-O cliente (index.html) se conecta e entra em uma room (exemplo: player1).
+- O cliente (index.html) se conecta e entra em uma room (exemplo: player1).
 
-O status de conexão é exibido na tela.
+- O status de conexão é exibido na tela.
