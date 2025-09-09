@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Jogador</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 400px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 24px;
+        }
+        h1 {
+            text-align: center;
+            color: #2a3a5e;
+            margin-bottom: 24px;
+        }
+        .dados {
+            font-size: 1.1em;
+            color: #333;
+        }
+        .dados p {
+            margin: 12px 0;
+        }
+        .label {
+            font-weight: bold;
+            color: #2a3a5e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Monitoramento em Tempo Real</h1>
+        <div id="dados" class="dados">
+            <p>Aguardando dados do sensor...</p>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+
+        // Entrar na sala do jogador
+        socket.emit("joinRoom", "player1");
+
+        socket.on("dadosSensor", (data) => {
+            document.getElementById("dados").innerHTML = `
+                <p><span class="label">BPM:</span> ${data.bpm}</p>
+                <p><span class="label">Velocidade:</span> ${data.velocidade}</p>
+                <p><span class="label">Posição:</span> (${data.posicao.x}, ${data.posicao.y})</p>
+            `;
+        });
+    </script>
+</body>
+</html>
