@@ -51,4 +51,11 @@ http://localhost:3000
 
 - O cliente (index.html) se conecta e entra em uma room (exemplo: player1).
 
-- O status de conexão é exibido na tela.
+- O jogador aparece como um ponto vermelho em um campo de futebol estilizado.
+
+- O ponto se move em tempo real de acordo com os dados recebidos do servidor.
+
+- BPM e velocidade também são exibidos na interface.
+
+## Exemplo da interface  
+![alt text](image.png)

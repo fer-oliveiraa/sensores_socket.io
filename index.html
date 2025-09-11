@@ -1,64 +1,105 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor de Jogador</title>
-    <script src="/socket.io/socket.io.js"></script>
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4f6fa;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 400px;
-            margin: 40px auto;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            padding: 24px;
-        }
-        h1 {
-            text-align: center;
-            color: #2a3a5e;
-            margin-bottom: 24px;
-        }
-        .dados {
-            font-size: 1.1em;
-            color: #333;
-        }
-        .dados p {
-            margin: 12px 0;
-        }
-        .label {
-            font-weight: bold;
-            color: #2a3a5e;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitor de Jogador</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 24px;
+    }
+    h1 {
+      text-align: center;
+      color: #2a3a5e;
+      margin-bottom: 20px;
+    }
+    .dados {
+      font-size: 1.1em;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    .dados p {
+      margin: 8px 0;
+    }
+    .label {
+      font-weight: bold;
+      color: #2a3a5e;
+    }
+    /* Campo de futebol */
+    .campo {
+      width: 500px;
+      height: 300px;
+      background: #4CAF50;
+      border: 2px solid #2a3a5e;
+      margin: 0 auto;
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    /* Jogador */
+    .jogador {
+      width: 20px;
+      height: 20px;
+      background: #ff4757;
+      border-radius: 50%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transform: translate(-50%, -50%);
+      transition: top 0.3s, left 0.3s;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Monitoramento em Tempo Real</h1>
-        <div id="dados" class="dados">
-            <p>Aguardando dados do sensor...</p>
-        </div>
+  <div class="container">
+    <h1>Monitoramento em Tempo Real</h1>
+
+    <div id="dados" class="dados">
+      <p>Aguardando dados do sensor...</p>
     </div>
 
-    <script>
-        const socket = io();
+    <!-- Campo e jogador -->
+    <div class="campo">
+      <div id="jogador" class="jogador"></div>
+    </div>
+  </div>
 
-        // Entrar na sala do jogador
-        socket.emit("joinRoom", "player1");
+  <script>
+    const socket = io();
 
-        socket.on("dadosSensor", (data) => {
-            document.getElementById("dados").innerHTML = `
-                <p><span class="label">BPM:</span> ${data.bpm}</p>
-                <p><span class="label">Velocidade:</span> ${data.velocidade}</p>
-                <p><span class="label">Posição:</span> (${data.posicao.x}, ${data.posicao.y})</p>
-            `;
-        });
-    </script>
+    // Entrar na sala do jogador
+    socket.emit("joinRoom", "player1");
+
+    socket.on("dadosSensor", (data) => {
+      document.getElementById("dados").innerHTML = `
+        <p><span class="label">BPM:</span> ${data.bpm}</p>
+        <p><span class="label">Velocidade:</span> ${data.velocidade}</p>
+        <p><span class="label">Posição:</span> (${data.posicao.x}, ${data.posicao.y})</p>
+      `;
+
+      // Atualizar posição do jogador no campo
+      const campo = document.querySelector(".campo");
+      const jogador = document.getElementById("jogador");
+
+      // Escala: servidor manda valores de 0 a 100 → ajustar para tamanho do campo
+      const posX = (data.posicao.x / 100) * campo.clientWidth;
+      const posY = (data.posicao.y / 100) * campo.clientHeight;
+
+      jogador.style.left = `${posX}px`;
+      jogador.style.top = `${posY}px`;
+    });
+  </script>
 </body>
 </html>
