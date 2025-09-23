@@ -6,17 +6,33 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
+// Armazena o estado de todos os jogadores conectados
+const players = {};
+
 app.get("/", (req, res) => {
     res.sendFile(__dirname + "/index.html");
 });
 
-//cada jogador e uma room
+// Lógica para quando um novo cliente se conecta
 io.on("connection", (socket) => {
-    console.log("Cliente conectado:", socket.id);
+    console.log("Novo jogador conectado:", socket.id);
 
-    socket.on("joinRoom", (room) => {
-        socket.join(room);
-        console.log(`Cliente entrou na sala: ${room}`);
+    // Adiciona o novo jogador ao nosso objeto de estado
+    players[socket.id] = {
+        id: socket.id,
+        bpm: 80,
+        velocidade: 0,
+        posicao: { x: 50, y: 50 } // Posição inicial no centro
+    };
+
+    // O socket entra em sua própria "sala" (room), que é seu ID
+    socket.join(socket.id);
+    console.log(`Jogador ${socket.id} entrou na sua sala.`);
+
+    // Lógica para quando o jogador se desconecta
+    socket.on("disconnect", () => {
+        console.log("Jogador desconectado:", socket.id);
+        delete players[socket.id]; // Remove o jogador do objeto
     });
 });
 
@@ -24,21 +40,41 @@ server.listen(3000, () => {
     console.log("Servidor rodando em http://localhost:3000");
 });
 
-function gerarDados() {
+
+function simularDados(player) {
+    
+    let bpmChange = Math.random() * 10 - 5; 
+    player.bpm = Math.max(60, Math.min(190, player.bpm + bpmChange)); 
+
+    
+    player.velocidade = Math.random() * 35; 
+
+    
+    let moveX = Math.random() * 6 - 3; 
+    let moveY = Math.random() * 6 - 3;
+    player.posicao.x = Math.max(0, Math.min(100, player.posicao.x + moveX)); 
+    player.posicao.y = Math.max(0, Math.min(100, player.posicao.y + moveY));
+
     return {
-        bpm: Math.floor(Math.random() * (180 - 60 + 1)) + 60,   //60-180 bpm
-        velocidade: (Math.random() * 30).toFixed(2),            //0-30 km/h
+        id: player.id,
+        bpm: Math.round(player.bpm),
+        velocidade: player.velocidade.toFixed(2),
         posicao: {
-            x: Math.floor(Math.random() * 100),                 //simudando campo 100x100
-            y: Math.floor(Math.random() * 100),                 
+            x: Math.round(player.posicao.x),
+            y: Math.round(player.posicao.y)
         }
     };
 }
 
-//enviar dados a cada 2s para cada room 
+
 setInterval(() => {
-    const jogador = "player1"; //exemplo de jogador
-    const dados = gerarDados();
-    io.to(jogador).emit("dadosSensor", dados);
-    console.log("Enviando:", dados);
-}, 2000);
+    
+    for (const id in players) {
+        const player = players[id];
+        const dadosAtualizados = simularDados(player);
+
+        
+        io.to(id).emit("dadosSensor", dadosAtualizados);
+        console.log(`Enviando para ${id}:`, dadosAtualizados);
+    }
+}, 1000); 

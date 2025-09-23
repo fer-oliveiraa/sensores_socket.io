@@ -4,14 +4,13 @@
 ![Express](https://img.shields.io/badge/Express-000000?style=flat&logo=express&logoColor=white)
 ![Socket.IO](https://img.shields.io/badge/Socket.IO-010101?style=flat&logo=socket.io&logoColor=white)
 
-Este projeto é uma atividade prática que simula sensores em jogadores de futebol.  
-Os dados (batimentos cardíacos, velocidade e posição em campo) são transmitidos em tempo real pelo servidor para os clientes via Socket.IO.
+Este projeto é uma atividade prática que simula sensores em jogadores de futebol, exibindo os dados em uma interface moderna. Os dados (batimentos cardíacos, velocidade e posição) são gerados no servidor e transmitidos em tempo real para cada cliente via Socket.IO, com a movimentação do jogador sendo exibida como um mapa de calor (heatmap).
 
 ---
 
 ## Estrutura do projeto
 sensores_socket.io/<br>
-├── index.html # Cliente web simples<br>
+├── index.html # Cliente web com a interface e o heatmap<br>
 ├── package.json # Dependências e scripts<br>
 ├── server.js # Servidor Express + Socket.IO<br>
 └── .gitignore <br>
@@ -22,6 +21,7 @@ sensores_socket.io/<br>
 - **Node.js**  
 - **Express**  
 - **Socket.IO**  
+- **Heatmap.js**
 
 ---
 
@@ -46,16 +46,10 @@ npm start
 ```
 http://localhost:3000
 ```
-## Funcionamento atual
-- O servidor cria uma conexão via Socket.IO.
+## Funcionalidades
+- **Suporte a Múltiplos Jogadores:** Cada cliente que se conecta ao servidor é tratado como um jogador único e independente.
+- **Simulação em Tempo Real:** O servidor simula e transmite dados de BPM, velocidade (km/h) e posição (x,y) para cada jogador a cada segundo.
+- **Visualização com Heatmap:** A movimentação do jogador no campo é exibida como um mapa de calor que é atualizado em tempo real.
+- **Interface Moderna:** A interface foi desenhada para se assemelhar a um aplicativo de monitoramento esportivo.
 
-- O cliente (index.html) se conecta e entra em uma room (exemplo: player1).
 
-- O jogador aparece como um ponto vermelho em um campo de futebol estilizado.
-
-- O ponto se move em tempo real de acordo com os dados recebidos do servidor.
-
-- BPM e velocidade também são exibidos na interface.
-
-## Exemplo da interface  
-![alt text](image.png)

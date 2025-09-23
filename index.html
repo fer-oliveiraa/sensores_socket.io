@@ -3,102 +3,149 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monitor de Jogador</title>
+  <title>Monitoramento de Jogador</title>
   <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/heatmapjs@2.0.2/heatmap.min.js"></script>
   <style>
     body {
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f4f6fa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #0d1a3b;
+      color: #fff;
       margin: 0;
-      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
-    .container {
-      max-width: 600px;
-      margin: 40px auto;
-      background: #fff;
+    .mobile-frame {
+      width: 414px;
+      height: 800px;
+      background: #11224a;
+      border-radius: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      padding: 20px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+    }
+    .header {
+        text-align: center;
+        padding: 10px;
+    }
+    .header h1 {
+        font-size: 1.5em;
+        margin: 0;
+        color: #ccd6f6;
+    }
+    .header p {
+        font-size: 0.9em;
+        color: #8892b0;
+        margin: 5px 0 20px;
+    }
+    .card {
+      background: #1c305c;
       border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      padding: 24px;
-    }
-    h1 {
-      text-align: center;
-      color: #2a3a5e;
+      padding: 20px;
       margin-bottom: 20px;
     }
-    .dados {
-      font-size: 1.1em;
-      color: #333;
-      margin-bottom: 20px;
-    }
-    .dados p {
-      margin: 8px 0;
-    }
-    .label {
+    .card-title {
+      font-size: 1em;
       font-weight: bold;
-      color: #2a3a5e;
+      color: #8892b0;
+      margin: 0 0 15px;
+      text-transform: uppercase;
     }
-    /* Campo de futebol */
-    .campo {
-      width: 500px;
-      height: 300px;
-      background: #4CAF50;
-      border: 2px solid #2a3a5e;
-      margin: 0 auto;
+   
+    .campo-container {
+      width: 100%;
+      height: 250px;
       position: relative;
+      background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><rect width="100%" height="100%" fill="%232a8a48"/><line stroke="%23FFFFFF" stroke-opacity="0.5" stroke-width="2" y2="100%" x2="50%" y1="0" x1="50%"/><circle stroke="%23FFFFFF" stroke-opacity="0.5" stroke-width="2" r="40" cy="50%" cx="50%" fill="none"/><rect stroke="%23FFFFFF" stroke-opacity="0.5" stroke-width="2" height="120" width="60" y="25%" x="0" fill="none"/><rect stroke="%23FFFFFF" stroke-opacity="0.5" stroke-width="2" height="120" width="60" y="25%" x="calc(100% - 60px)" fill="none"/></svg>');
+      background-size: cover;
       border-radius: 8px;
-      overflow: hidden;
     }
-    /* Jogador */
-    .jogador {
-      width: 20px;
-      height: 20px;
-      background: #ff4757;
-      border-radius: 50%;
-      position: absolute;
-      top: 0;
-      left: 0;
-      transform: translate(-50%, -50%);
-      transition: top 0.3s, left 0.3s;
+    .heatmap-instance {
+      width: 100%;
+      height: 100%;
+    }
+    .dados-reais {
+        display: flex;
+        justify-content: space-around;
+        text-align: center;
+    }
+    .dado {
+        font-size: 1.8em;
+        font-weight: bold;
+        color: #ccd6f6;
+    }
+    .dado-label {
+        font-size: 0.8em;
+        color: #8892b0;
+        text-transform: uppercase;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Monitoramento em Tempo Real</h1>
-
-    <div id="dados" class="dados">
-      <p>Aguardando dados do sensor...</p>
+  <div class="mobile-frame">
+    <div class="header">
+        <h1>Heat Map</h1>
+        <p>Dados de movimentação em tempo real</p>
     </div>
 
-    <!-- Campo e jogador -->
-    <div class="campo">
-      <div id="jogador" class="jogador"></div>
+    <div class="card">
+        <h2 class="card-title">Mapa de Calor</h2>
+        <div id="campo" class="campo-container">
+            </div>
+    </div>
+
+    <div class="card">
+        <h2 class="card-title">Métricas Atuais</h2>
+        <div id="dados" class="dados-reais">
+            <div class="metrica">
+                <div id="bpm" class="dado">-</div>
+                <div class="dado-label">BPM</div>
+            </div>
+             <div class="metrica">
+                <div id="velocidade" class="dado">-</div>
+                <div class="dado-label">Km/h</div>
+            </div>
+             <div class="metrica">
+                <div id="posicao" class="dado">-, -</div>
+                <div class="dado-label">Posição</div>
+            </div>
+        </div>
     </div>
   </div>
 
   <script>
     const socket = io();
+    const campo = document.getElementById("campo");
 
-    // Entrar na sala do jogador
-    socket.emit("joinRoom", "player1");
+   
+    const heatmapInstance = h337.create({
+      container: campo,
+      radius: 20, 
+      maxOpacity: .6,
+      minOpacity: 0,
+      blur: .75
+    });
 
+    
     socket.on("dadosSensor", (data) => {
-      document.getElementById("dados").innerHTML = `
-        <p><span class="label">BPM:</span> ${data.bpm}</p>
-        <p><span class="label">Velocidade:</span> ${data.velocidade}</p>
-        <p><span class="label">Posição:</span> (${data.posicao.x}, ${data.posicao.y})</p>
-      `;
+     
+      document.getElementById("bpm").textContent = data.bpm;
+      document.getElementById("velocidade").textContent = data.velocidade;
+      document.getElementById("posicao").textContent = `${data.posicao.x}, ${data.posicao.y}`;
 
-      // Atualizar posição do jogador no campo
-      const campo = document.querySelector(".campo");
-      const jogador = document.getElementById("jogador");
-
-      // Escala: servidor manda valores de 0 a 100 → ajustar para tamanho do campo
+    
       const posX = (data.posicao.x / 100) * campo.clientWidth;
       const posY = (data.posicao.y / 100) * campo.clientHeight;
 
-      jogador.style.left = `${posX}px`;
-      jogador.style.top = `${posY}px`;
+      heatmapInstance.addData({
+        x: Math.round(posX),
+        y: Math.round(posY),
+        value: 1 
+      });
     });
   </script>
 </body>
